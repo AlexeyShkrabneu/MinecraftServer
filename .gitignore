@@ -1,0 +1,13 @@
+﻿.vs
+Application/bin
+Application/obj
+Domain/bin
+Domain/obj
+FarmCraft/bin
+FarmCraft/obj
+Infrastructure/bin
+Infrastructure/obj
+Persistence/bin
+Persistence/obj
+Server/bin
+Server/obj

@@ -1,0 +1,11 @@
+﻿global using Server.Options;
+global using System.Net;
+global using Serilog;
+global using Microsoft.Extensions.DependencyInjection;
+global using Serilog.Events;
+global using Serilog.Sinks.SystemConsole.Themes;
+global using System.Globalization;
+global using System.Text;
+global using Infrastructure;
+global using Persistence;
+global using System.Net.Sockets;
