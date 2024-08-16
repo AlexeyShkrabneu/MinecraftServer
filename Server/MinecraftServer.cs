@@ -4,7 +4,6 @@ public class MinecraftServer : IDisposable
 {
     private readonly ILogger _logger;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IClientManagerService _clientService;
 
     private readonly Thread _listenerThread;
     private readonly TcpListener _serverListener;
@@ -20,7 +19,6 @@ public class MinecraftServer : IDisposable
         _cancellationTokenSource = new();
 
         _logger = serviceProvider.GetRequiredService<ILogger>();
-        _clientService = serviceProvider.GetRequiredService<IClientManagerService>();
 
         _serverListener = new TcpListener(_serverOptions.Ip, _serverOptions.Port);
         _listenerThread = new Thread(async () => await StartTcpListenerAsync(_cancellationTokenSource.Token));
@@ -96,7 +94,7 @@ public class MinecraftServer : IDisposable
         do
         {
             var tcpClient = await _serverListener.AcceptTcpClientAsync(cancellationToken);
-            var connection = await _clientService.HandshakeAsync(tcpClient, cancellationToken);
+            var connection = await Connection.HandshakeAsync(tcpClient);
 
             _logger.Information("New client has been connected");
 

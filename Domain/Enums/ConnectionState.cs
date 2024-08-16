@@ -1,10 +1,11 @@
 ﻿namespace Domain.Enums;
 
-public enum NextState
+public enum ConnectionState
 {
     Handshake,
     Status,
     Login,
+    Configuration,
     Play
 }
 
