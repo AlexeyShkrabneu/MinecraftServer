@@ -1,4 +1,6 @@
-﻿namespace Persistence;
+﻿using Application.Abstractions.Database;
+
+namespace Persistence;
 
 public static class DependencyInjection
 {

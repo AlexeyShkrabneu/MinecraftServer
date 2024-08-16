@@ -1,4 +1,4 @@
-﻿namespace Application.Interfaces.Database;
+﻿namespace Application.Abstractions.Database;
 
 public interface IServerDbContext
 {

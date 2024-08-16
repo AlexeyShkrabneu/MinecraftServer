@@ -9,4 +9,8 @@
     <ProjectReference Include="..\Application\Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Packages\Outbound\" />
+  </ItemGroup>
+
 </Project>
