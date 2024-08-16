@@ -6,6 +6,8 @@ public static class DependencyInjection
     {
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
+        services.AddTransient<IConnectionHandler, ConnectionHandler>();
+
         return services;
     }
 }

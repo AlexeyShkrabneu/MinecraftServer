@@ -3,6 +3,7 @@
 public class Connection : IConnection
 {
     public bool Active => CheckConnection();
+    public bool DataAvailable => _connectionStream.DataAvailable;
     public int ProtocolVersion { get; }
     public ConnectionState State { get; private set; }
 
@@ -22,8 +23,11 @@ public class Connection : IConnection
         ProtocolVersion = pVersion;
     }
 
-    public static async Task<Connection> HandshakeAsync(TcpClient client, CancellationToken cancellationToken = default)
+    public static async Task<IConnection> HandshakeAsync(TcpClient client, CancellationToken cancellationToken = default)
     {
+        client.SendTimeout = 3000;
+        client.ReceiveTimeout = 3000;
+
         var connectionStream = new ConnectionStream(client.GetStream());
 
         var packageLength = await connectionStream.ReadVarIntAsync(cancellationToken);
@@ -44,6 +48,9 @@ public class Connection : IConnection
             return disposeAndDefault();
         }
 
+        client.SendTimeout = 10000;
+        client.ReceiveTimeout = 10000;
+
         return new Connection(client, connectionStream, (ConnectionState)nextState, pVersion);
 
         Connection disposeAndDefault()
@@ -56,6 +63,14 @@ public class Connection : IConnection
 
             return null;
         }
+    }
+
+    public async Task<IncomingPackageHeader> ReadIncomingPackageHeaderAsync(CancellationToken cancellationToken = default)
+    {
+        var length = await _connectionStream.ReadVarIntAsync(cancellationToken);
+        var id = await _connectionStream.ReadVarIntAsync(cancellationToken);
+
+        return new IncomingPackageHeader(id, length);
     }
 
     public void Dispose()

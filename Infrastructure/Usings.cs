@@ -7,3 +7,5 @@ global using Application.Network.Interaction;
 global using System.Text;
 global using System.Net;
 global using Domain.Constants;
+global using Infrastructure.Network.Interaction;
+global using Application.Network.Paskage;
