@@ -1,19 +1,50 @@
 ﻿namespace Infrastructure.Network.Interaction;
 
-public class ConnectionHandler : IConnectionHandler
+public class ConnectionHandler(
+    ILogger logger,
+    ILoginPackageHandler loginHandler,
+    IStatusPackageHandler statusHandler,
+    IPlayPackageHandler playPackageHandler,
+    IConfigurationPackageHandler configurationHandler) : IConnectionHandler
 {
     public async Task HandleAsync(IConnection connection, CancellationToken cancellationToken = default)
     {
-        while (connection.Active && !cancellationToken.IsCancellationRequested) 
+        try
         {
-            if (connection.DataAvailable)
+            while (connection.Active && !cancellationToken.IsCancellationRequested)
             {
-                var packageHeader = await connection.ReadIncomingPackageHeaderAsync(cancellationToken);
-                
-                connection.Dispose();
+                if (connection.DataAvailable)
+                {
+                    var packageHeader = await connection.ReadIncomingPackageHeaderAsync(cancellationToken);
+
+                    IPackageHandler packageHandler = connection.State switch
+                    {
+                        ConnectionState.Login => loginHandler,
+                        ConnectionState.Status => statusHandler,
+                        ConnectionState.Play => playPackageHandler,
+                        ConnectionState.Configuration => configurationHandler,
+
+                        _ => throw new Exception("Unreachable exception")
+                    };
+
+                    var handeled = await packageHandler.HandlePackageAsync(connection, packageHeader, cancellationToken);
+
+                    if (!handeled)
+                    {
+                        logger.Warning(
+                            "The received client package could not be processed. [PackageId: 0x{0}, PackageLength: {1}, ConnectionState: {2}]",
+                            packageHeader.PackageId.ToString("X2"), packageHeader.Length, connection.State.ToString());
+                    }
+                }
             }
         }
-
-        connection.Dispose();
+        catch (Exception ex) 
+        {
+            logger.Error(ex, "Error occurred while handling  connection. Exception:");
+        }
+        finally 
+        { 
+            connection.Dispose(); 
+        }
     }
 }

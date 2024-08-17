@@ -1,5 +1,7 @@
-﻿global using Application.Abstractions.Services;
+﻿global using Application.Network.Interaction;
+global using Domain.Options;
 global using Infrastructure;
+global using Infrastructure.Network.Interaction;
 global using Microsoft.Extensions.DependencyInjection;
 global using Serilog;
 global using Serilog.Events;
@@ -9,5 +11,3 @@ global using System.Globalization;
 global using System.Net;
 global using System.Net.Sockets;
 global using System.Text;
-global using Infrastructure.Network.Interaction;
-global using Application.Network.Interaction;

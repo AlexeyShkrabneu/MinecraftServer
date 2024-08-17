@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.Network.Interaction;
 
-public class ConnectionStream(NetworkStream _networkStream)
+public class ConnectionStream(NetworkStream _networkStream) : IConnectionStream, IDisposable
 {
     public bool DataAvailable => _networkStream.DataAvailable;
     private readonly List<byte> _responseBuffer = new();
@@ -68,7 +68,7 @@ public class ConnectionStream(NetworkStream _networkStream)
     #endregion
 
     #region Write
-    public void WriteVarInt(int value)
+    public IConnectionStream WriteVarInt(int value)
     {
         do
         {
@@ -81,24 +81,32 @@ public class ConnectionStream(NetworkStream _networkStream)
 
             _responseBuffer.Add(temp);
         } while (value != 0);
+
+        return this;
     }
 
-    public void WriteLong(long value)
+    public IConnectionStream WriteLong(long value)
     {
         _responseBuffer.AddRange(BitConverter.GetBytes(IPAddress.HostToNetworkOrder(value)));
+
+        return this;
     }
 
-    public void WriteString(string value)
+    public IConnectionStream WriteString(string value)
     {
         var encodedValue = Encoding.UTF8.GetBytes(value);
 
         WriteVarInt(encodedValue.Length);
         _responseBuffer.AddRange(encodedValue);
+
+        return this;
     }
 
-    public void WriteBytes(byte[] value)
+    public IConnectionStream WriteBytes(byte[] value)
     {
         _responseBuffer.AddRange(value);
+
+        return this;
     }
 
     public async Task SendAsync(CancellationToken cancellationToken = default)
@@ -119,7 +127,6 @@ public class ConnectionStream(NetworkStream _networkStream)
 
         _responseBuffer.Clear();
     }
-
     #endregion
 
     public void Close() => _networkStream.Close();

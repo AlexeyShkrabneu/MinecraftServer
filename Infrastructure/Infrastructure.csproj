@@ -9,9 +9,4 @@
     <ProjectReference Include="..\Application\Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Network\Package\ClientBound\Handshake\" />
-    <Folder Include="Network\Package\ServerBound\" />
-  </ItemGroup>
-
 </Project>

@@ -2,5 +2,5 @@
 
 public abstract class PackageBase(int packageId)
 {
-    public readonly int Id = packageId;
+    public readonly int PackageId = packageId;
 }

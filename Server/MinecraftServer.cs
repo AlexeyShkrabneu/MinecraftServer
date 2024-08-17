@@ -8,11 +8,11 @@ public class MinecraftServer : IDisposable
 
     private readonly Thread _listenerThread;
     private readonly TcpListener _serverListener;
-    private readonly ServerOptions _serverOptions;
+    private readonly ConfigureServerOptions _serverOptions;
     private readonly CancellationTokenSource _cancellationTokenSource;
     public bool IsRunning { get; private set; }
 
-    internal MinecraftServer(ServerOptions serverOptions, IServiceProvider serviceProvider)
+    internal MinecraftServer(ConfigureServerOptions serverOptions, IServiceProvider serviceProvider)
     {
         _serverOptions = serverOptions;
         _serviceProvider = serviceProvider;
@@ -46,6 +46,12 @@ public class MinecraftServer : IDisposable
             _serverListener.Start();
             _listenerThread.Start();
             IsRunning = true;
+
+
+            if (_serverOptions.DisplayInLocalNetwork)
+            {
+                _ = Task.Run(async () => await ViewInLocalNetworkAsync(_cancellationTokenSource.Token));
+            }
 
             _logger.Information("Server has been started!");
         }
@@ -91,19 +97,42 @@ public class MinecraftServer : IDisposable
 
     private async Task StartTcpListenerAsync(CancellationToken cancellationToken)
     {
-        _logger.Information("Waiting for client connections...");
+        try
+        {
+            _logger.Information("Waiting for client connections...");
+            do
+            {
+                var tcpClient = await _serverListener.AcceptTcpClientAsync(cancellationToken);
+                var connection = await Connection.HandshakeAsync(tcpClient);
+
+                if (connection is null)
+                {
+                    continue;
+                }
+
+                _ = Task.Run(async () => await _connectionHandler.HandleAsync(connection, cancellationToken));
+            } while (IsRunning);
+        }
+        catch (OperationCanceledException) { /* Ignored */ }
+    }
+
+    private async Task ViewInLocalNetworkAsync(CancellationToken cancellationToken = default)
+    {
+        const int brodcastPort = 4445;
+        const string brodcastAddress = "224.0.2.60";
+        var brodcastIPEndPoint = new IPEndPoint(IPAddress.Parse(brodcastAddress), brodcastPort);
+
+        using var udpSender = new UdpClient();
+        var package = $"[MOTD]§a{_serverOptions.Name}[/MOTD][AD]{_serverOptions.Port}[/AD]";
+        var packageInBytes = Encoding.UTF8.GetBytes(package);
 
         do
         {
-            var tcpClient = await _serverListener.AcceptTcpClientAsync(cancellationToken);
-            var connection = await Connection.HandshakeAsync(tcpClient);
-
-            if(connection is null)
-            {
-                continue;
-            }
-
-            _ = Task.Run(async () => await _connectionHandler.HandleAsync(connection, cancellationToken));
+            await udpSender.SendAsync(packageInBytes, brodcastIPEndPoint);
+            await Task.Delay(1000);
         } while (IsRunning);
+
+        udpSender.Close();
+        udpSender.Dispose();
     }
 }

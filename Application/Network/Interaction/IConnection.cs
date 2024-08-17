@@ -6,6 +6,7 @@ public interface IConnection : IDisposable
     bool DataAvailable { get; }
     int ProtocolVersion { get; }
     ConnectionState State  { get; }
+    IConnectionStream Stream { get; }
 
     Task<IncomingPackageHeader> ReadIncomingPackageHeaderAsync(CancellationToken cancellationToken = default);
 }

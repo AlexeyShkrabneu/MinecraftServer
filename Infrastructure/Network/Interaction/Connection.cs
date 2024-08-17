@@ -4,6 +4,7 @@ public class Connection : IConnection
 {
     public bool Active => CheckConnection();
     public bool DataAvailable => _connectionStream.DataAvailable;
+    public IConnectionStream Stream => _connectionStream;
     public int ProtocolVersion { get; }
     public ConnectionState State { get; private set; }
 

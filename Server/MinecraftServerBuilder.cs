@@ -5,14 +5,14 @@ public class MinecraftServerBuilder
     private const string DefaultLogFilePath = "Logs/log_.txt";
     private const string DefaultLogOutputTemplate = "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{Message:lj}{NewLine}{Exception}";
 
-    private readonly ServerOptions _serverOptions = new();
+    private readonly ConfigureServerOptions _serverOptions = new();
     private readonly IServiceCollection _services = new ServiceCollection();
 
     private LoggerConfiguration _loggerConfiguration = null;
 
     internal MinecraftServerBuilder() { }
 
-    public MinecraftServerBuilder ConfigureServer(Action<ServerOptions> serverOptions = null)
+    public MinecraftServerBuilder ConfigureServer(Action<ConfigureServerOptions> serverOptions = null)
     {
         if(serverOptions is null)
         {
@@ -30,7 +30,7 @@ public class MinecraftServerBuilder
 
         ValidateServerIconFormatAndSize(iconFileInBytes);
 
-        _serverOptions.IconBase64 = $"data:image/png;base64,{Convert.ToBase64String(iconFileInBytes)}";
+        _serverOptions.UseIcon($"data:image/png;base64,{Convert.ToBase64String(iconFileInBytes)}");
 
         return this;
     }
@@ -69,11 +69,12 @@ public class MinecraftServerBuilder
                     formatProvider: new DateTimeFormatInfo(),
                     levelSwitch: null,
                     standardErrorFromLevel: LogEventLevel.Error,
-                    theme: AnsiConsoleTheme.Code
+                    theme: AnsiConsoleTheme.Sixteen
                 );
         }
 
         _services.AddSingleton<ILogger>(_loggerConfiguration.CreateLogger());
+        _services.AddSingleton<ServerOptions>(_serverOptions);
 
         //_services.AddPersistence(_serverOptions.DbConnectionString, _serverOptions.IsDevelopment);
         _services.AddInfrastructure();
