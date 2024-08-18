@@ -11,7 +11,7 @@ public class LoginStartServerBoundPackage(
         connection.ChangeState(ConnectionState.Login);
 
         var userName = await connection.Stream.ReadStringAsync(cancellationToken);
-        var id = await connection.Stream.ReadStringAsync(cancellationToken);
+        var id = await connection.Stream.ReadUUIDAsync(cancellationToken);
 
         if (userName.Length > serverOptions.MaxPlayerUserNameLength)
         {
@@ -31,30 +31,47 @@ public class LoginStartServerBoundPackage(
                 DefaultTextComponents.ServerVersionIsModern(serverOptions.VersionName));
         }
 
+        if (playerManager.OnlinePlayers.Length == serverOptions.MaxPlayersCount)
+        {
+            return new LoginDisconnectCleintBoundPackage(
+                DefaultTextComponents.ServerMaxPlayersOnline(serverOptions.MaxPlayersCount));
+        }
+
         if (playerManager.IsPlayerOnline(userName))
         {
             return new LoginDisconnectCleintBoundPackage(
                 DefaultTextComponents.PlayerIsAlreadyOnline(userName));
         }
 
-        if(serverOptions.OnlineMode || serverOptions.UseEncryption)
+        var player = await GetPlayerProfileAsync(userName, cancellationToken);
+
+        connection.SetPlayer(player);
+
+        if (serverOptions.OnlineMode || serverOptions.UseEncryption)
         {
             var publicKeyParameters = serverEncryption.RSA.ExportParameters(false);
             var publicKey = serverEncryption.RSA.ExportRSAPublicKey();
 
             var publicKeyDer = EncodePublicKeyToAsn1Der(publicKey, publicKeyParameters);
-            var myKey = Convert.ToBase64String(publicKeyDer);
+            
+            var verificationToken = new byte[4];
+            serverOptions.Random.NextBytes(verificationToken);
 
-            return new EncryptionRequestClientBoundPackage(publicKeyDer, serverOptions.OnlineMode);
+            connection.SetVerifyToken(verificationToken);
+
+            return new EncryptionRequestClientBoundPackage(publicKeyDer, verificationToken, serverOptions.OnlineMode);
         }
-        
+
+        return new LoginSuccessClientBoundPackage();
+
+
         throw new NotImplementedException();
     }
 
     private byte[] EncodePublicKeyToAsn1Der(byte[] publicKey, RSAParameters rsaParameters)
     {
         var writer = new AsnWriter(AsnEncodingRules.DER);
-        writer.PushSequence(Asn1Tag.Sequence);
+        writer.PushSequence();
             writer.PushSequence();
                 writer.WriteObjectIdentifier("1.2.840.113549.1.1.1");
                 writer.WriteNull();
@@ -63,5 +80,57 @@ public class LoginStartServerBoundPackage(
         writer.PopSequence();
 
         return writer.Encode();
+    }
+
+    private async Task<IPlayer> GetPlayerProfileAsync(string username, CancellationToken cancellationToken = default)
+    {
+        const string mojangApi = "https://api.mojang.com/";
+        const string profileInfo = "/users/profiles/minecraft/{0}";
+
+        const string mojangSessionServerApi = "https://sessionserver.mojang.com/";
+        const string sessionProfileInfo = "/session/minecraft/profile/{0}?unsigned=false";
+
+        var mojangApiClient = new HttpClient { BaseAddress = new Uri(mojangApi) };
+        var mojangSessionServerApiClient = new HttpClient { BaseAddress = new Uri(mojangSessionServerApi) };
+
+        try
+        {
+            var playerMojangProfileInfoResponse = await mojangApiClient
+                .GetAsync(string.Format(profileInfo, username), cancellationToken);
+
+            var playerProfileInfoJson = await playerMojangProfileInfoResponse.Content.ReadAsStringAsync(cancellationToken);
+            var playerProfileInfo = JsonConvert.DeserializeObject<MojangPlayerProfileInfoResponse>(playerProfileInfoJson);
+
+            if (!playerMojangProfileInfoResponse.IsSuccessStatusCode || !string.IsNullOrWhiteSpace(playerProfileInfo.ErrorMessage))
+            {
+                var message = playerProfileInfo.ErrorMessage ?? "Player profile was not found at Mojang.";
+                throw new Exception(message);
+            }
+            
+            var userId = new Guid(playerProfileInfo.Id);
+
+            var playerSessionProfileInfoResponse = await mojangSessionServerApiClient
+                .GetAsync(string.Format(sessionProfileInfo, playerProfileInfo.Id), cancellationToken);
+
+            var playerSessionProfileInfoJson = await playerSessionProfileInfoResponse.Content.ReadAsStringAsync(cancellationToken);
+            var playerSessionProfileInfo = JsonConvert.DeserializeObject<MojangPlayerSessionProfileInfoResponse>(playerSessionProfileInfoJson);
+
+            if (!playerSessionProfileInfoResponse.IsSuccessStatusCode || !string.IsNullOrWhiteSpace(playerSessionProfileInfo.ErrorMessage))
+            {
+                var message = playerSessionProfileInfo.ErrorMessage ?? "Player profile was not found at Mojang.";
+                throw new Exception(message);
+            }
+
+            return new Player(userId, playerSessionProfileInfo.Name, playerSessionProfileInfo.Properties);
+        } 
+        catch
+        {
+            return new Player(Guid.NewGuid(), username, Array.Empty<PlayerProperty>());
+        }
+        finally
+        {
+            mojangApiClient.Dispose();
+            mojangSessionServerApiClient.Dispose();
+        }
     }
 }

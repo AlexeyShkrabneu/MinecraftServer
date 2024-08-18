@@ -10,7 +10,7 @@ public static class DefaultTextComponents
             Exta =
             [
                 new() { Text = userName, Color = "#50C878" },
-                new() { Text = "!\nUsername is not allowed to be longer than " },
+                new() { Text = "!\n\nUsername is not allowed to be longer than " },
                 new() { Text = maxPlayerUserNameLength.ToString(), Color = "#0ABAB5" },
                 new() { Text = " characters!" }
             ]
@@ -25,7 +25,7 @@ public static class DefaultTextComponents
             Color = "#1CD3A2",
             Exta =
             [
-                new() { Text = "\nOur server is not yet available on your version of Minecraft." },
+                new() { Text = "\n\nOur server is not yet available on your version of Minecraft." },
                 new() { Text = "\nIn order to play, please use: " },
                 new() { Text = $"Minecraft {versionName}", Color = "#0ABAB5" }
             ]
@@ -40,7 +40,7 @@ public static class DefaultTextComponents
             Color = "#1CD3A2",
             Exta =
             [
-                new() { Text = "\nYour version of Minecraft is outdated." },
+                new() { Text = "\n\nYour version of Minecraft is outdated." },
                 new() { Text = "\nIn order to play, please update to: " },
                 new() { Text = $"Minecraft {versionName}", Color = "#0ABAB5" }
             ]
@@ -56,6 +56,40 @@ public static class DefaultTextComponents
             Exta =
             [
                 new() { Text = " is already on the server!" },
+            ]
+        };
+    }
+
+    public static TextComponent EncryptionIssuesWhileLogin(string description)
+    {
+        return new()
+        {
+            Text = "It's definitely not your fault!",
+            Color = "#50C878",
+            Exta =
+            [
+                new() { Text = $"\n\nIssue: ", Color = "#92000A" },
+                new() { Text = description },
+                new() { Text = "\nTry again " },
+                new() { Text = "later", Color = "#50C878" }
+            ]
+        };
+    }
+
+    public static TextComponent ServerMaxPlayersOnline(int maxPlayersCount)
+    {
+        return new()
+        {
+            Text = "Oops...",
+            Color = "#92000A",
+            Exta =
+            [
+                new() { Text = " The server is full." },
+                new() { Text = "\n\nThere are already  " },
+                new() { Text = $"{maxPlayersCount}/{maxPlayersCount} ", Color = "#05fa09" },
+                new() { Text = "players playing on the server."},
+                new() { Text = "\nTry to connect " },
+                new() { Text = "later", Color = "#50C878" }
             ]
         };
     }

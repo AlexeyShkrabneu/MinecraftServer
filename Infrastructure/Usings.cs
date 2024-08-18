@@ -6,6 +6,7 @@ global using Domain.Constants;
 global using Domain.Enums;
 global using Domain.Models;
 global using Domain.Models.Encryption;
+global using Domain.Models.MojangAuth;
 global using Domain.Models.Text;
 global using Domain.Options;
 global using Infrastructure.Network.Interaction;

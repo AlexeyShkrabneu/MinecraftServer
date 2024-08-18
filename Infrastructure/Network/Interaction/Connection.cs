@@ -6,9 +6,10 @@ public class Connection : IConnection
     public bool DataAvailable => _connectionStream.DataAvailable;
     public IConnectionStream Stream => _connectionStream;
     public int ProtocolVersion { get; }
+    public IPlayer Player { get; private set; } 
     public ConnectionState State { get; private set; }
 
-    private byte[] VerifyToken { get; set; }
+    private byte[] _verifyToken { get; set; }
 
     private readonly TcpClient _tcpClient;
     private readonly ConnectionStream _connectionStream;
@@ -76,15 +77,21 @@ public class Connection : IConnection
         return new IncomingPackageHeader(id, length);
     }
 
-    public void ChangeState(ConnectionState connectionState)
+    public bool ValidateVerifyToken(byte[] verifyTokenBytes)
     {
-        State = connectionState;
+        if (_verifyToken is null || verifyTokenBytes is null 
+            || _verifyToken.Length != verifyTokenBytes.Length) 
+        {
+            return false;
+        }
+
+        return verifyTokenBytes.SequenceEqual(_verifyToken);
     }
 
-    public void SetVerifyToken(byte[] verifyTokenBytes)
-    {
-        VerifyToken = verifyTokenBytes;
-    }
+    public void ChangeState(ConnectionState connectionState) => State = connectionState;
+    public void SetVerifyToken(byte[] verifyTokenBytes) => _verifyToken = verifyTokenBytes;
+    public void UseEncryption(byte[] sharedKey) => _connectionStream.UseEncryption(sharedKey);
+    public void SetPlayer(IPlayer player) => Player = player;
 
     public void Dispose()
     {

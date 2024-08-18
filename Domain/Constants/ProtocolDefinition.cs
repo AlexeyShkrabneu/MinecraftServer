@@ -11,6 +11,7 @@ public static class ProtocolDefinition
 
     #region Login
     public const int LoginStart = 0x00;
+    public const int LoginSuccessPackageId = 0x02;
     public const int LoginDisconnectPackageId = 0x00;
     public const int EncryptionRequestPackageId = 0x01;
     public const int EncryptionResponsePackageId = 0x01;

@@ -36,4 +36,6 @@ public class ServerOptions
     public bool OnlineMode { get; set; } = DefaultOnlineMode;
     public bool UseEncryption { get; set; } = DefautlUseEncryption;
     #endregion
+
+    public Random Random = new();
 }
