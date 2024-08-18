@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace Domain.Options;
+﻿namespace Domain.Options;
 
 public class ServerOptions
 {

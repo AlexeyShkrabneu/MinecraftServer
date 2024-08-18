@@ -1,11 +1,10 @@
 ﻿namespace Infrastructure.Network.Package.ServerBound.Login;
 
 public class LoginStartServerBoundPackage(
-    int packageId,
     ServerOptions serverOptions,
     IPlayerManager playerManager,
     ServerEncryption serverEncryption)
-        : ServerBoundPackage(packageId)
+        : ServerBoundPackage(ProtocolDefinition.LoginStart)
 {
     public async override Task<ClientBoundPackage> HandleAsync(IConnection connection, CancellationToken cancellationToken = default)
     {
@@ -49,7 +48,6 @@ public class LoginStartServerBoundPackage(
             return new EncryptionRequestClientBoundPackage(publicKeyDer, serverOptions.OnlineMode);
         }
         
-
         throw new NotImplementedException();
     }
 

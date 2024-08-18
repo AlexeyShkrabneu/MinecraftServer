@@ -7,8 +7,8 @@ public class StatusPackageHandler(
 {
     private List<ServerBoundPackage> _statusPackages = new()
     {
-        new StatusServerBoundPackage(ProtocolDefinition.StatusPackageId, serverOptions, playerManager),
-        new PingServerBoundPackage(ProtocolDefinition.PingPackageId)
+        new StatusServerBoundPackage(serverOptions, playerManager),
+        new PingServerBoundPackage()
     };
 
     public async Task<bool> HandlePackageAsync(IConnection connection, IncomingPackageHeader packageHeader, CancellationToken cancellationToken = default)

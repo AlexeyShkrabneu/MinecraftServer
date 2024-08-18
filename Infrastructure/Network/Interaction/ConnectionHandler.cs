@@ -32,8 +32,8 @@ public class ConnectionHandler(
                     if (!handeled)
                     {
                         logger.Warning(
-                            "The received client package could not be processed. [PackageId: 0x{0}, PackageLength: {1}, ConnectionState: {2}]",
-                            packageHeader.PackageId.ToString("X2"), packageHeader.Length, connection.State.ToString());
+                            "The received client package could not be processed.\r\n   [PackageId: '{0}', PackageLength: '{1}', ConnectionState: '{2}']\n",
+                                "0x" + packageHeader.PackageId.ToString("X2"), packageHeader.Length, connection.State.ToString());
                     }
                 }
             }

@@ -1,7 +1,4 @@
-﻿using Application.Abstractions.Database;
-using Application.Abstractions.Services;
-
-namespace Persistence;
+﻿namespace Persistence;
 
 internal class ServerDbContext : DbContext, IServerDbContext
 {

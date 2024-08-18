@@ -8,7 +8,7 @@ public class LoginPackageHandler(
 {
     private readonly List<ServerBoundPackage> _loginsPackages = new()
     {
-        new LoginStartServerBoundPackage(ProtocolDefinition.LoginStart, serverOptions, playerManager, serverEncryption)
+        new LoginStartServerBoundPackage(serverOptions, playerManager, serverEncryption)
     };
 
     public async Task<bool> HandlePackageAsync(IConnection connection, IncomingPackageHeader packageHeader, CancellationToken cancellationToken = default)

@@ -1,10 +1,9 @@
 ﻿namespace Infrastructure.Network.Package.ServerBound.Status;
 
 public class StatusServerBoundPackage(
-    int packageId,
     ServerOptions serverOptions,
     IPlayerManager playerManager) 
-        : ServerBoundPackage(packageId)
+        : ServerBoundPackage(ProtocolDefinition.StatusPackageId)
 {
     public override Task<ClientBoundPackage> HandleAsync(IConnection connection, CancellationToken cancellationToken = default)
     {

@@ -1,8 +1,7 @@
 ﻿namespace Infrastructure.Network.Package.ServerBound.Status;
 
-public class PingServerBoundPackage
-    (int packageId) 
-        : ServerBoundPackage(packageId)
+public class PingServerBoundPackage()
+    : ServerBoundPackage(ProtocolDefinition.PingPackageId)
 {
     public async override Task<ClientBoundPackage> HandleAsync(IConnection connection, CancellationToken cancellationToken = default)
     {
