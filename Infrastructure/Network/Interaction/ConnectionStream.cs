@@ -7,10 +7,22 @@ public class ConnectionStream(NetworkStream _networkStream) : IConnectionStream,
     private readonly List<byte> _responseBuffer = new();
     private readonly Dictionary<int, byte[]> _responseProperties = new();
 
+    #region Encryption
     private bool _isEncryption { get; set; }
-    private Aes _aes1 { get; set; }
-    private ICryptoTransform _decryptor { get; set; }
-    private ICryptoTransform _encryptor { get; set; }
+    private BufferedBlockCipher _decryptor { get; set; }
+    private BufferedBlockCipher _encryptor { get; set; }
+
+    public void UseEncryption(byte[] sharedKey)
+    {
+        _encryptor = new BufferedBlockCipher(new CfbBlockCipher(new AesEngine(), 8));
+        _encryptor.Init(true, new ParametersWithIV(new KeyParameter(sharedKey), sharedKey, 0, 16));
+
+        _decryptor = new BufferedBlockCipher(new CfbBlockCipher(new AesEngine(), 8));
+        _decryptor.Init(false, new ParametersWithIV(new KeyParameter(sharedKey), sharedKey, 0, 16));
+
+        _isEncryption = true;
+    }
+    #endregion
 
     #region Read
     public async Task<byte> ReadByteAsync(CancellationToken cancellationToken = default)
@@ -20,7 +32,7 @@ public class ConnectionStream(NetworkStream _networkStream) : IConnectionStream,
 
         if (_isEncryption)
         {
-            buffer = await DecryptBytesAsync(buffer);
+            buffer = DecryptBytes(buffer);
         }
 
         return buffer[0];
@@ -33,7 +45,7 @@ public class ConnectionStream(NetworkStream _networkStream) : IConnectionStream,
 
         if (_isEncryption)
         {
-            buffer = await DecryptBytesAsync(buffer);
+            buffer = DecryptBytes(buffer);
         }
 
         return buffer;
@@ -108,6 +120,7 @@ public class ConnectionStream(NetworkStream _networkStream) : IConnectionStream,
 
         return this;
     }
+
     public IConnectionStream WriteLong(long value) => WriteBytes(ToBytes(value));
     public IConnectionStream WriteUUID(Guid value) => WriteBytes(ToBytes(value));
     public IConnectionStream WriteBool(bool value) => WriteBytes(ToBytes(value));
@@ -159,23 +172,10 @@ public class ConnectionStream(NetworkStream _networkStream) : IConnectionStream,
         WriteBytes(dataToSend);
 
         dataToSend = _responseBuffer.ToArray();
-        var dataToSends = Convert.ToBase64String(dataToSend);
-
-
-
 
         if (_isEncryption)
         {
-            Console.WriteLine("\n\n\n");
-            Console.WriteLine("Before: " + dataToSends);
-
-            Console.WriteLine("\n\n\n");
-
-            dataToSend = await EncryptBytesAsync(dataToSend, cancellationToken);
-            
-            var d = Convert.ToBase64String(dataToSend);
-            Console.WriteLine("Aflter: " + d);
-
+            dataToSend = EncryptBytes(dataToSend);
         }
 
         await _networkStream.WriteAsync(dataToSend, cancellationToken);
@@ -185,58 +185,11 @@ public class ConnectionStream(NetworkStream _networkStream) : IConnectionStream,
     }
     #endregion
 
-    public void UseEncryption(byte[] sharedKey)
-    {
-        _aes1 = Aes.Create();
-        _aes1.KeySize = 128;
-        _aes1.FeedbackSize = 8;
-        _aes1.Mode = CipherMode.CFB;
-        _aes1.Padding = PaddingMode.None;
-        
-        _decryptor = _aes1.CreateDecryptor(sharedKey, sharedKey);
-        _encryptor = _aes1.CreateEncryptor(sharedKey, sharedKey);
+    public void Close() => _networkStream?.Close();
+    public void Dispose() => _networkStream?.Dispose();
 
-
-        var d = string.Join(' ', sharedKey.Select(x => x.ToString("X2")));
-        Console.WriteLine(d);
-
-        _isEncryption = true;
-    }
-
-    public void Close()
-    {
-        _aes1?.Clear();
-        _networkStream?.Close();
-    }
-
-    public void Dispose()
-    {
-        _aes1?.Dispose();
-        _encryptor?.Dispose();
-        _decryptor?.Dispose();
-        _networkStream?.Dispose();
-    }
-
-    private async Task<byte[]> EncryptBytesAsync(byte[] plainBytes, CancellationToken cancellationToken = default)
-    {
-        using var ms = new MemoryStream();
-        using var cs = new CryptoStream(ms, _encryptor, CryptoStreamMode.Write);
-        
-        await cs.WriteAsync(plainBytes, 0, plainBytes.Length, cancellationToken);
-
-        return ms.ToArray();
-    }
-
-    private async Task<byte[]> DecryptBytesAsync(byte[] cipherBytes, CancellationToken cancellationToken = default)
-    {
-        using var ms = new MemoryStream(cipherBytes);
-        using var cs = new CryptoStream(ms, _decryptor, CryptoStreamMode.Read);
-        using var output = new MemoryStream();
-        
-        await cs.CopyToAsync(output, cancellationToken);
-        
-        return output.ToArray();
-    }
+    private byte[] EncryptBytes(byte[] plainBytes) => _encryptor.ProcessBytes(plainBytes);
+    private byte[] DecryptBytes(byte[] cipherBytes) => _decryptor.ProcessBytes(cipherBytes);
 
     private byte[] ToBytesVarInt(int value)
     {

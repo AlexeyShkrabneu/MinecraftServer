@@ -124,7 +124,7 @@ public class MinecraftServerBuilder
             int chunkLength = BitConverter.ToInt32(iconInBytes, index);
             index += 4;
 
-            string chunkType = System.Text.Encoding.ASCII.GetString(iconInBytes, index, 4);
+            string chunkType = Encoding.ASCII.GetString(iconInBytes, index, 4);
             index += 4;
 
             if (chunkType != "IHDR")
