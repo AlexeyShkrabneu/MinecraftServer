@@ -1,5 +1,3 @@
 ﻿namespace Application.Network.Paskage.Handlers;
 
-public interface ILoginPackageHandler : IPackageHandler
-{
-}
+public interface ILoginPackageHandler : IBasePackageHandler;

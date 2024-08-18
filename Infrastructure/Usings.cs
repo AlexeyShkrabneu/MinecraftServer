@@ -11,6 +11,7 @@ global using Domain.Models.Text;
 global using Domain.Options;
 global using Infrastructure.Network.Interaction;
 global using Infrastructure.Network.Package.ClientBound;
+global using Infrastructure.Network.Package.ClientBound.Common;
 global using Infrastructure.Network.Package.ClientBound.Login;
 global using Infrastructure.Network.Package.ClientBound.Status;
 global using Infrastructure.Network.Package.Handlers;

@@ -1,9 +1,8 @@
 ﻿namespace Infrastructure.Network.Package.Handlers;
 
-public class ConfigurationPackageHandler : IConfigurationPackageHandler
+public class ConfigurationPackageHandler : BasePackageHandler, IConfigurationPackageHandler
 {
-    public Task<bool> HandlePackageAsync(IConnection connection, IncomingPackageHeader packageHeader, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
+    internal override List<ServerBoundPackage> _packages { get; } = 
+    [
+    ];
 }

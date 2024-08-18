@@ -15,8 +15,6 @@ public class LoginSuccessClientBoundPackage()
             .WriteBool(true)
             .SendAsync(cancellationToken);
         
-        connection.ChangeState(ConnectionState.Play);
-
         return true;
     }
 }

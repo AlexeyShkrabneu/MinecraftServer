@@ -17,7 +17,7 @@ public class ConnectionHandler(
                 {
                     var packageHeader = await connection.ReadIncomingPackageHeaderAsync(cancellationToken);
 
-                    IPackageHandler packageHandler = connection.State switch
+                    IBasePackageHandler packageHandler = connection.State switch
                     {
                         ConnectionState.Login => loginHandler,
                         ConnectionState.Status => statusHandler,

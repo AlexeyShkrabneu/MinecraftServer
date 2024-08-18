@@ -1,5 +1,3 @@
 ﻿namespace Application.Network.Paskage.Handlers;
 
-public interface IPlayPackageHandler : IPackageHandler
-{
-}
+public interface IPlayPackageHandler : IBasePackageHandler;

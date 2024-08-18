@@ -1,5 +1,3 @@
 ﻿namespace Application.Network.Paskage.Handlers;
 
-public interface IConfigurationPackageHandler : IPackageHandler
-{
-}
+public interface IConfigurationPackageHandler : IBasePackageHandler;

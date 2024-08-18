@@ -1,9 +1,8 @@
 ﻿namespace Infrastructure.Network.Package.Handlers;
 
-class PlayPackageHandler : IPlayPackageHandler
+class PlayPackageHandler : BasePackageHandler, IPlayPackageHandler
 {
-    public Task<bool> HandlePackageAsync(IConnection connection, IncomingPackageHeader packageHeader, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
+    internal override List<ServerBoundPackage> _packages { get; } =
+    [
+    ];
 }
