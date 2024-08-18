@@ -10,11 +10,13 @@ public interface IConnectionStream
     Task<string> ReadStringAsync(CancellationToken cancellationToken = default);
     Task<ushort> ReadUShortAsync(CancellationToken cancellationToken = default);
     Task<long> ReadLongAsync(CancellationToken cancellationToken = default);
+    Task<bool> ReadBool(CancellationToken cancellationToken = default);
 
     IConnectionStream WriteVarInt(int value);
     IConnectionStream WriteLong(long value);
     IConnectionStream WriteString(string value);
     IConnectionStream WriteBytes(byte[] value);
+    IConnectionStream WriteBool(bool value);
 
     Task SendAsync(CancellationToken cancellationToken = default);
 }

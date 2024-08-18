@@ -79,6 +79,13 @@ public class MinecraftServerBuilder
         //_services.AddPersistence(_serverOptions.DbConnectionString, _serverOptions.IsDevelopment);
         _services.AddInfrastructure();
 
+        _services.AddSingleton(new ServerEncryption
+        {
+            RSA = _serverOptions.OnlineMode || _serverOptions.UseEncryption
+                ? RSA.Create(1024)
+                : null
+        });
+
         return new MinecraftServer(_serverOptions, _services.BuildServiceProvider());
     }
 

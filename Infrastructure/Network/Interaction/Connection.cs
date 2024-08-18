@@ -8,6 +8,8 @@ public class Connection : IConnection
     public int ProtocolVersion { get; }
     public ConnectionState State { get; private set; }
 
+    private byte[] VerifyToken { get; set; }
+
     private readonly TcpClient _tcpClient;
     private readonly ConnectionStream _connectionStream;
 
@@ -72,6 +74,16 @@ public class Connection : IConnection
         var id = await _connectionStream.ReadVarIntAsync(cancellationToken);
 
         return new IncomingPackageHeader(id, length);
+    }
+
+    public void ChangeState(ConnectionState connectionState)
+    {
+        State = connectionState;
+    }
+
+    public void SetVerifyToken(byte[] verifyTokenBytes)
+    {
+        VerifyToken = verifyTokenBytes;
     }
 
     public void Dispose()

@@ -3,7 +3,7 @@
 public class TextComponent
 {
     [JsonProperty("type", NullValueHandling = NullValueHandling.Ignore)]
-    public TextComponentType Type { get; set; }
+    public TextComponentType Type { get; set; } = TextComponentType.Text;
 
     [JsonProperty("text", NullValueHandling = NullValueHandling.Ignore)]
     public string Text { get; set; }
@@ -42,5 +42,5 @@ public class TextComponent
     public TextComponent[] With { get; set; }
 
     [JsonProperty("color", NullValueHandling = NullValueHandling.Ignore)]
-    public string Color { get; set; }
+    public string Color { get; set; } = "white";
 }

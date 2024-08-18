@@ -65,6 +65,12 @@ public class ConnectionStream(NetworkStream _networkStream) : IConnectionStream,
 
         return BitConverter.ToInt64(longBytes);
     }
+
+    public async Task<bool> ReadBool(CancellationToken cancellationToken = default)
+    {
+        var boolByte = await ReadByteAsync(cancellationToken);
+        return boolByte is 0x01;
+    }
     #endregion
 
     #region Write
@@ -102,9 +108,17 @@ public class ConnectionStream(NetworkStream _networkStream) : IConnectionStream,
         return this;
     }
 
-    public IConnectionStream WriteBytes(byte[] value)
+    public IConnectionStream WriteBytes(params byte[] value)
     {
         _responseBuffer.AddRange(value);
+
+        return this;
+    }
+
+    public IConnectionStream WriteBool(bool value)
+    {
+        var boolByte = value ? (byte)0x01 : (byte)0x00;
+        WriteBytes(boolByte);
 
         return this;
     }

@@ -9,4 +9,6 @@ public interface IConnection : IDisposable
     IConnectionStream Stream { get; }
 
     Task<IncomingPackageHeader> ReadIncomingPackageHeaderAsync(CancellationToken cancellationToken = default);
+    void ChangeState(ConnectionState connectionState);
+    void SetVerifyToken(byte[] verifyTokenBytes);
 }

@@ -1,4 +1,5 @@
 ﻿global using Application.Network.Interaction;
+global using Domain.Models.Encryption;
 global using Domain.Options;
 global using Infrastructure;
 global using Infrastructure.Network.Interaction;
@@ -10,4 +11,5 @@ global using Server.Options;
 global using System.Globalization;
 global using System.Net;
 global using System.Net.Sockets;
+global using System.Security.Cryptography;
 global using System.Text;

@@ -1,4 +1,6 @@
-﻿namespace Domain.Options;
+﻿using System.Security.Cryptography;
+
+namespace Domain.Options;
 
 public class ServerOptions
 {
@@ -6,10 +8,13 @@ public class ServerOptions
     protected const ushort DefaultPort = 25565;
     protected const int DefaultMaxPlayersCount = 10;
     protected const int DefaultProtocolVersion = 767;
+    protected const int DefaultMaxPlayerUserNameLength = 16;
     protected const string DefaultHots = "localhost";
     protected const string DefaultName = "Minecraft Server";
     protected const string DefaultVersionName = "1.21";
     protected const bool DefaultEnforcesSecureChat = false;
+    protected const bool DefaultOnlineMode = false;
+    protected const bool DefautlUseEncryption = true;
     protected const bool DefaultDisplayInLocalNetwork = true;
     protected static readonly TextComponent DefaultDescription = new()
     {
@@ -17,7 +22,6 @@ public class ServerOptions
         Text = "Locale Minecraft Server",
         Color = "#7eff47"
     };
-
     #endregion
 
     #region Game options
@@ -30,5 +34,8 @@ public class ServerOptions
     public int MaxPlayersCount { get; set; } = DefaultMaxPlayersCount;
     public bool EnforcesSecureChat { get; set; } = DefaultEnforcesSecureChat;
     public bool DisplayInLocalNetwork { get; set; } = DefaultDisplayInLocalNetwork;
+    public int MaxPlayerUserNameLength { get; set; } = DefaultMaxPlayerUserNameLength;
+    public bool OnlineMode { get; set; } = DefaultOnlineMode;
+    public bool UseEncryption { get; set; } = DefautlUseEncryption;
     #endregion
 }
