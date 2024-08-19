@@ -65,8 +65,6 @@ public class LoginStartServerBoundPackage(
                 serverEncryption.PublicKeyDERFormat, verificationToken, serverOptions.OnlineMode);
         }
 
-        //ToDo If Commpression set, then set commpression before login success;
-
         return new LoginSuccessClientBoundPackage();
     }
 }

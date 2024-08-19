@@ -34,8 +34,6 @@ public class EncryptionResponseServerBoundPackage(
             }
         }
 
-        //ToDo If Commpression set, then set commpression before login success;
-
         return new LoginSuccessClientBoundPackage();
     }
 }
