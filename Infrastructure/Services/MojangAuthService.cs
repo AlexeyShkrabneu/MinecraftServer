@@ -32,7 +32,7 @@ public class MojangAuthService(
 
     public async Task<bool> IsAuthenticatedAsync(string username, byte[] sharedSecret, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(username) || sharedSecret.Length != 16)
+        if (string.IsNullOrEmpty(username) || sharedSecret.Length != 128)
         {
             return false;
         }
