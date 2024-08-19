@@ -16,5 +16,6 @@ public static class ProtocolDefinition
     public const int LoginAcknowledgedPackageId = 0x03;
     public const int EncryptionRequestPackageId = 0x01;
     public const int EncryptionResponsePackageId = 0x01;
+    public const string ServerId = "";
     #endregion
 }

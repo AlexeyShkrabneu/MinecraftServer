@@ -49,17 +49,13 @@ public class LoginStartServerBoundPackage(
 
         if (serverOptions.OnlineMode || serverOptions.UseEncryption)
         {
-            var publicKeyParameters = serverEncryption.RSA.ExportParameters(false);
-            var publicKey = serverEncryption.RSA.ExportRSAPublicKey();
-
-            var publicKeyDer = EncodePublicKeyToAsn1Der(publicKey, publicKeyParameters);
-            
             var verificationToken = new byte[4];
             serverOptions.Random.NextBytes(verificationToken);
 
             connection.SetVerifyToken(verificationToken);
 
-            return new EncryptionRequestClientBoundPackage(publicKeyDer, verificationToken, serverOptions.OnlineMode);
+            return new EncryptionRequestClientBoundPackage(
+                serverEncryption.PublicKeyDERFormat, verificationToken, serverOptions.OnlineMode);
         }
 
         return new LoginSuccessClientBoundPackage();
@@ -68,19 +64,7 @@ public class LoginStartServerBoundPackage(
         throw new NotImplementedException();
     }
 
-    private byte[] EncodePublicKeyToAsn1Der(byte[] publicKey, RSAParameters rsaParameters)
-    {
-        var writer = new AsnWriter(AsnEncodingRules.DER);
-        writer.PushSequence();
-            writer.PushSequence();
-                writer.WriteObjectIdentifier("1.2.840.113549.1.1.1");
-                writer.WriteNull();
-            writer.PopSequence();    
-            writer.WriteBitString(publicKey);
-        writer.PopSequence();
-
-        return writer.Encode();
-    }
+    
 
     private async Task<IPlayer> GetPlayerProfileAsync(string username, CancellationToken cancellationToken = default)
     {

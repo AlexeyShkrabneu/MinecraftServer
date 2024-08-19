@@ -10,7 +10,7 @@ public class EncryptionRequestClientBoundPackage(
     {
         await connection.Stream
             .WriteVarInt(Id)
-            .WriteString("")
+            .WriteString(ProtocolDefinition.ServerId)
             .WriteByteArrayWithLength(publicKey)
             .WriteByteArrayWithLength(verifyToken)
             .WriteBool(shouldAuthenticate)
