@@ -6,7 +6,7 @@ public class Connection : IConnection
     public bool DataAvailable => _connectionStream.DataAvailable;
     public IConnectionStream Stream => _connectionStream;
     public int ProtocolVersion { get; }
-    public IPlayer Player { get; private set; } 
+    public IPlayerProfile PlayerProfile { get; private set; } 
     public ConnectionState State { get; private set; }
 
     private byte[] _verifyToken { get; set; }
@@ -88,10 +88,10 @@ public class Connection : IConnection
         return verifyTokenBytes.SequenceEqual(_verifyToken);
     }
 
-    public void ChangeState(ConnectionState connectionState) => State = connectionState;
+    public void SetState(ConnectionState connectionState) => State = connectionState;
     public void SetVerifyToken(byte[] verifyTokenBytes) => _verifyToken = verifyTokenBytes;
     public void UseEncryption(byte[] sharedKey) => _connectionStream.UseEncryption(sharedKey);
-    public void SetPlayer(IPlayer player) => Player = player;
+    public void SetPlayerProfile(IPlayerProfile playerProfile) => PlayerProfile = playerProfile;
 
     public void Dispose()
     {

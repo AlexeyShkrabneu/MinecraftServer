@@ -5,7 +5,7 @@ internal class LoginAcknowledgedServerBoundPackage()
 {
     public override Task<ClientBoundPackage> HandleAsync(IConnection connection, CancellationToken cancellationToken = default)
     {
-        connection.ChangeState(ConnectionState.Play);
+        connection.SetState(ConnectionState.Play);
 
         return Task.FromResult<ClientBoundPackage>(new NoActionNeededClientBoundPackage());
     }

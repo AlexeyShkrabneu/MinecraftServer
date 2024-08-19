@@ -4,11 +4,17 @@ public class ServerEncryption
 {
     public RSA RSA { get; set; } = null;
 
+    public byte[] PublicKey 
+    { 
+        get => _publicKey ??= RSA?.ExportRSAPublicKey();
+    }
+
     public byte[] PublicKeyDERFormat
     {
         get => _publicKeyDERFormat ??= EncodePublicKeyToAsn1Der();
     }
 
+    private byte[] _publicKey;
     private byte[] _publicKeyDERFormat;
 
     private byte[] EncodePublicKeyToAsn1Der()
@@ -18,15 +24,13 @@ public class ServerEncryption
             return null;
         }
 
-        var publicKeyBytes = RSA.ExportRSAPublicKey();
-
         var writer = new AsnWriter(AsnEncodingRules.DER);
         writer.PushSequence();
         writer.PushSequence();
         writer.WriteObjectIdentifier("1.2.840.113549.1.1.1");
         writer.WriteNull();
         writer.PopSequence();
-        writer.WriteBitString(publicKeyBytes);
+        writer.WriteBitString(PublicKey);
         writer.PopSequence();
 
         return writer.Encode();

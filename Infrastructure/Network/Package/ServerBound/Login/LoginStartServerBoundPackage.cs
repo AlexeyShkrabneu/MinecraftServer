@@ -2,21 +2,22 @@
 
 public class LoginStartServerBoundPackage(
     ServerOptions serverOptions,
+    ServerEncryption serverEncryption,
     IPlayerManager playerManager,
-    ServerEncryption serverEncryption)
+    IMojangAuthService mojangAuthService)
         : ServerBoundPackage(ProtocolDefinition.LoginStart)
 {
     public async override Task<ClientBoundPackage> HandleAsync(IConnection connection, CancellationToken cancellationToken = default)
     {
-        connection.ChangeState(ConnectionState.Login);
+        connection.SetState(ConnectionState.Login);
 
-        var userName = await connection.Stream.ReadStringAsync(cancellationToken);
-        var id = await connection.Stream.ReadUUIDAsync(cancellationToken);
+        var playerName = await connection.Stream.ReadStringAsync(cancellationToken);
+        var playerId = await connection.Stream.ReadGuidAsync(cancellationToken);
 
-        if (userName.Length > serverOptions.MaxPlayerUserNameLength)
+        if (playerName.Length > serverOptions.MaxPlayerUserNameLength)
         {
             return new LoginDisconnectCleintBoundPackage(
-                DefaultTextComponents.UsernameInvalidLength(userName, serverOptions.MaxPlayerUserNameLength));
+                DefaultTextComponents.UsernameInvalidLength(playerName, serverOptions.MaxPlayerUserNameLength));
         }
 
         if(connection.ProtocolVersion > serverOptions.ProtocolVersion)
@@ -37,15 +38,21 @@ public class LoginStartServerBoundPackage(
                 DefaultTextComponents.ServerMaxPlayersOnline(serverOptions.MaxPlayersCount));
         }
 
-        if (playerManager.IsPlayerOnline(userName))
+        if (playerManager.IsPlayerOnline(playerName))
         {
             return new LoginDisconnectCleintBoundPackage(
-                DefaultTextComponents.PlayerIsAlreadyOnline(userName));
+                DefaultTextComponents.PlayerIsAlreadyOnline(playerName));
         }
 
-        var player = await GetPlayerProfileAsync(userName, cancellationToken);
+        var playerProfile = await mojangAuthService.GetMojangPlayerProfileAsync(playerName, playerId, cancellationToken);
 
-        connection.SetPlayer(player);
+        if (!playerProfile.ExistsInMojang && serverOptions.OnlineMode) 
+        {
+            return new LoginDisconnectCleintBoundPackage(
+                DefaultTextComponents.ServerOplineModeUnathorizadPlayer());
+        }
+
+        connection.SetPlayerProfile(playerProfile);
 
         if (serverOptions.OnlineMode || serverOptions.UseEncryption)
         {
@@ -58,63 +65,8 @@ public class LoginStartServerBoundPackage(
                 serverEncryption.PublicKeyDERFormat, verificationToken, serverOptions.OnlineMode);
         }
 
+        //ToDo If Commpression set, then set commpression before login success;
+
         return new LoginSuccessClientBoundPackage();
-
-
-        throw new NotImplementedException();
-    }
-
-    
-
-    private async Task<IPlayer> GetPlayerProfileAsync(string username, CancellationToken cancellationToken = default)
-    {
-        const string mojangApi = "https://api.mojang.com/";
-        const string profileInfo = "/users/profiles/minecraft/{0}";
-
-        const string mojangSessionServerApi = "https://sessionserver.mojang.com/";
-        const string sessionProfileInfo = "/session/minecraft/profile/{0}?unsigned=false";
-
-        var mojangApiClient = new HttpClient { BaseAddress = new Uri(mojangApi) };
-        var mojangSessionServerApiClient = new HttpClient { BaseAddress = new Uri(mojangSessionServerApi) };
-
-        try
-        {
-            var playerMojangProfileInfoResponse = await mojangApiClient
-                .GetAsync(string.Format(profileInfo, username), cancellationToken);
-
-            var playerProfileInfoJson = await playerMojangProfileInfoResponse.Content.ReadAsStringAsync(cancellationToken);
-            var playerProfileInfo = JsonConvert.DeserializeObject<MojangPlayerProfileInfoResponse>(playerProfileInfoJson);
-
-            if (!playerMojangProfileInfoResponse.IsSuccessStatusCode || !string.IsNullOrWhiteSpace(playerProfileInfo.ErrorMessage))
-            {
-                var message = playerProfileInfo.ErrorMessage ?? "Player profile was not found at Mojang.";
-                throw new Exception(message);
-            }
-            
-            var userId = new Guid(playerProfileInfo.Id);
-
-            var playerSessionProfileInfoResponse = await mojangSessionServerApiClient
-                .GetAsync(string.Format(sessionProfileInfo, playerProfileInfo.Id), cancellationToken);
-
-            var playerSessionProfileInfoJson = await playerSessionProfileInfoResponse.Content.ReadAsStringAsync(cancellationToken);
-            var playerSessionProfileInfo = JsonConvert.DeserializeObject<MojangPlayerSessionProfileInfoResponse>(playerSessionProfileInfoJson);
-
-            if (!playerSessionProfileInfoResponse.IsSuccessStatusCode || !string.IsNullOrWhiteSpace(playerSessionProfileInfo.ErrorMessage))
-            {
-                var message = playerSessionProfileInfo.ErrorMessage ?? "Player profile was not found at Mojang.";
-                throw new Exception(message);
-            }
-
-            return new Player(userId, playerSessionProfileInfo.Name, playerSessionProfileInfo.Properties);
-        } 
-        catch
-        {
-            return new Player(Guid.NewGuid(), username, Array.Empty<PlayerProperty>());
-        }
-        finally
-        {
-            mojangApiClient.Dispose();
-            mojangSessionServerApiClient.Dispose();
-        }
     }
 }

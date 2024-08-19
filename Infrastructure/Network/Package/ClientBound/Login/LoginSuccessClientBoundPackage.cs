@@ -5,14 +5,12 @@ public class LoginSuccessClientBoundPackage()
 {
     public async override Task<bool> RespondAsync(IConnection connection, CancellationToken cancellationToken = default)
     {
-        var playerUUID = BitConverter.ToUInt16(connection.Player.Id.ToByteArray());
-
         await connection.Stream
             .WriteVarInt(Id)
-            .WriteUUID(connection.Player.Id)
-            .WriteString(connection.Player.Username)
-            .WriteProperties(connection.Player.Properties)
-            .WriteBool(true)
+            .WriteGuid(connection.PlayerProfile.Id)
+            .WriteString(connection.PlayerProfile.Username)
+            .WriteProperties(connection.PlayerProfile.Properties)
+            .WriteBool(ProtocolDefinition.CleintStrictErrorHandling)
             .SendAsync(cancellationToken);
         
         return true;

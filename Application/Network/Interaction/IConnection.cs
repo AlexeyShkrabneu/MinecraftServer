@@ -7,12 +7,12 @@ public interface IConnection : IDisposable
     int ProtocolVersion { get; }
     ConnectionState State  { get; }
     IConnectionStream Stream { get; }
-    IPlayer Player { get; }
+    IPlayerProfile PlayerProfile { get; }
 
     Task<IncomingPackageHeader> ReadIncomingPackageHeaderAsync(CancellationToken cancellationToken = default);
-    void ChangeState(ConnectionState connectionState);
+    void SetState(ConnectionState connectionState);
     void SetVerifyToken(byte[] verifyTokenBytes);
     bool ValidateVerifyToken(byte[] verifyTokenBytes);
     void UseEncryption(byte[] sharedKey);
-    void SetPlayer(IPlayer player);
+    void SetPlayerProfile(IPlayerProfile player);
 }

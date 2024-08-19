@@ -1,4 +1,7 @@
-﻿namespace Domain.Constants;
+﻿
+using System.Drawing;
+
+namespace Domain.Constants;
 
 public static class DefaultTextComponents
 {
@@ -60,22 +63,6 @@ public static class DefaultTextComponents
         };
     }
 
-    public static TextComponent EncryptionIssuesWhileLogin(string description)
-    {
-        return new()
-        {
-            Text = "It's definitely not your fault!",
-            Color = "#50C878",
-            Exta =
-            [
-                new() { Text = $"\n\nIssue: ", Color = "#92000A" },
-                new() { Text = description },
-                new() { Text = "\nTry again " },
-                new() { Text = "later", Color = "#50C878" }
-            ]
-        };
-    }
-
     public static TextComponent ServerMaxPlayersOnline(int maxPlayersCount)
     {
         return new()
@@ -90,6 +77,22 @@ public static class DefaultTextComponents
                 new() { Text = "players playing on the server."},
                 new() { Text = "\nTry to connect " },
                 new() { Text = "later", Color = "#50C878" }
+            ]
+        };
+    }
+
+    public static TextComponent ServerOplineModeUnathorizadPlayer()
+    {
+        return new()
+        {
+            Text = "Oops...",
+            Color = "#92000A",
+            Exta =
+            [
+                new() { Text = "\n\nThis server accepts only licensed clients." },
+                new() { Text = "\nPlease buy "},
+                new() { Text = "Minecraft ", Color = "#05fa09" },
+                new() { Text = "in order to play!" },
             ]
         };
     }

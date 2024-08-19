@@ -1,6 +1,6 @@
 ﻿namespace Domain.Models.MojangAuth;
 
-public class MojangPlayerSessionProfileInfoResponse
+public class MojangPlayerProfileResponse
 {
     [JsonProperty("id")]
     public string Id { get; set; }

@@ -2,14 +2,15 @@
 
 public class LoginPackageHandler(
     ServerOptions serverOptions,
+    ServerEncryption serverEncryption,
     IPlayerManager playerManager,
-    ServerEncryption serverEncryption) 
+    IMojangAuthService mojangAuthService) 
         : BasePackageHandler, ILoginPackageHandler
 {
     internal override List<ServerBoundPackage> _packages { get; } =
     [
-        new LoginStartServerBoundPackage(serverOptions, playerManager, serverEncryption),
-        new EncryptionResponseServerBoundPackage(serverOptions, serverEncryption),
+        new LoginStartServerBoundPackage(serverOptions, serverEncryption, playerManager, mojangAuthService),
+        new EncryptionResponseServerBoundPackage(serverOptions, serverEncryption, mojangAuthService),
         new LoginAcknowledgedServerBoundPackage(),
     ];
 }

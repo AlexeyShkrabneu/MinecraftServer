@@ -51,7 +51,7 @@ public class ConnectionStream(NetworkStream _networkStream) : IConnectionStream,
         return buffer;
     }
 
-    public async Task<Guid> ReadUUIDAsync(CancellationToken cancellation = default)
+    public async Task<Guid> ReadGuidAsync(CancellationToken cancellation = default)
     {
         var bytes = await ReadBytesAsync(16, cancellation);
         return new Guid(bytes, true);
@@ -122,7 +122,7 @@ public class ConnectionStream(NetworkStream _networkStream) : IConnectionStream,
     }
 
     public IConnectionStream WriteLong(long value) => WriteBytes(ToBytes(value));
-    public IConnectionStream WriteUUID(Guid value) => WriteBytes(ToBytes(value));
+    public IConnectionStream WriteGuid(Guid value) => WriteBytes(ToBytes(value));
     public IConnectionStream WriteBool(bool value) => WriteBytes(ToBytes(value));
     public IConnectionStream WriteString(string value) => WriteBytes(ToBytes(value));
     public IConnectionStream WriteVarInt(int value) => WriteBytes(ToBytesVarInt(value));

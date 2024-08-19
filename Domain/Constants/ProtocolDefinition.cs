@@ -17,5 +17,6 @@ public static class ProtocolDefinition
     public const int EncryptionRequestPackageId = 0x01;
     public const int EncryptionResponsePackageId = 0x01;
     public const string ServerId = "";
+    public const bool CleintStrictErrorHandling = false;
     #endregion
 }
