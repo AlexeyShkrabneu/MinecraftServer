@@ -46,7 +46,7 @@ public class LoginStartServerBoundPackage(
 
         var playerProfile = await mojangAuthService.GetMojangPlayerProfileAsync(playerName, playerId, cancellationToken);
 
-        if (!playerProfile.ExistsInMojang && serverOptions.OnlineMode) 
+        if (playerProfile is null || !playerProfile.ExistsInMojang && serverOptions.OnlineMode) 
         {
             return new LoginDisconnectCleintBoundPackage(
                 DefaultTextComponents.ServerOplineModeUnathorizadPlayer());
