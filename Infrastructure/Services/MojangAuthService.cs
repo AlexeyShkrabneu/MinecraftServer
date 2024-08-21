@@ -1,6 +1,4 @@
-﻿using System.Buffers.Text;
-
-namespace Infrastructure.Services;
+﻿namespace Infrastructure.Services;
 
 public class MojangAuthService(
     ServerEncryption serverEncryption)
@@ -8,7 +6,7 @@ public class MojangAuthService(
 {
     private const string _mojangSessionApi = "https://sessionserver.mojang.com/";
 
-    public async Task<IPlayerProfile> GetMojangPlayerProfileAsync(
+    public async Task<IPlayerProfile> GetPlayerProfileAsync(
         string username, Guid playerId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(username))
@@ -32,11 +30,12 @@ public class MojangAuthService(
         return new PlayerProfile(Guid.NewGuid(), username, [], false);
     }
 
-    public async Task<bool> IsAuthenticatedAsync(string username, byte[] sharedSecret, CancellationToken cancellationToken = default)
+    public async Task<IPlayerProfile> GetAuthenticatedPlayerProfileAsync(
+        string username, byte[] sharedSecret, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(username) || sharedSecret.Length != 16)
         {
-            return false;
+            return null;
         }
 
         var serverHash = GenerateServerHash(sharedSecret);
@@ -47,8 +46,14 @@ public class MojangAuthService(
         var playerJoinedResponse = await httpClient.GetAsync(hasJoinedRoute, cancellationToken);
         var playerJoinedJson = await playerJoinedResponse.Content.ReadAsStringAsync(cancellationToken);
 
-        return playerJoinedResponse.StatusCode is HttpStatusCode.OK 
-            && !string.IsNullOrWhiteSpace(playerJoinedJson);
+        if(playerJoinedResponse.StatusCode is not HttpStatusCode.OK ||
+           string.IsNullOrWhiteSpace(playerJoinedJson))
+        {
+            return null;
+        }
+
+        var mojangProfile = JsonConvert.DeserializeObject<MojangPlayerProfileResponse>(playerJoinedJson);
+        return new PlayerProfile(new Guid(mojangProfile.Id), mojangProfile.Name, mojangProfile.Properties, true);
     }
 
     private string GenerateServerHash(byte[] sharedSecretBytes)

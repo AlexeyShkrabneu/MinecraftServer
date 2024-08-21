@@ -44,6 +44,7 @@ public class LoginStartServerBoundPackage(
                 DefaultTextComponents.PlayerIsAlreadyOnline(playerName));
         }
 
+        /*
         var playerProfile = await mojangAuthService.GetMojangPlayerProfileAsync(playerName, playerId, cancellationToken);
 
         if (playerProfile is null || !playerProfile.ExistsInMojang && serverOptions.OnlineMode) 
@@ -53,6 +54,9 @@ public class LoginStartServerBoundPackage(
         }
 
         connection.SetPlayerProfile(playerProfile);
+        */
+
+        connection.SetPlayerProfile(new PlayerProfile(playerId, playerName, [], false));
 
         if (serverOptions.OnlineMode || serverOptions.UseEncryption)
         {
@@ -64,6 +68,9 @@ public class LoginStartServerBoundPackage(
             return new EncryptionRequestClientBoundPackage(
                 serverEncryption.PublicKeyDERFormat, verificationToken, serverOptions.OnlineMode);
         }
+
+        var profile = await mojangAuthService.GetPlayerProfileAsync(playerName, playerId, cancellationToken);
+        connection.SetPlayerProfile(profile);
 
         return new LoginSuccessClientBoundPackage();
     }

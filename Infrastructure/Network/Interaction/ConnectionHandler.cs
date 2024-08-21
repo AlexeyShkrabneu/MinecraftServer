@@ -31,12 +31,11 @@ public class ConnectionHandler(
 
                     if (!handeled && packageHeader.Length > 0)
                     {
-                        var packageBytes = await connection.Stream.ReadBytesAsync(packageHeader.Length, cancellationToken);
-                        var packageData = Convert.ToBase64String(packageBytes);
+                        _ = await connection.Stream.ReadBytesAsync(packageHeader.Length, cancellationToken);
 
                         logger.Warning(
-                            "The received client package could not be processed.\r\n   [PackageId: '{0}', PackageLength: '{1}', ConnectionState: '{2}']\n data base64: [{3}]\n",
-                                "0x" + packageHeader.PackageId.ToString("X2"), packageHeader.Length, connection.State.ToString(), packageData);
+                            "The received client package could not be processed.\r\n   [PackageId: '{0}', PackageLength: '{1}', ConnectionState: '{2}']\n",
+                                "0x" + packageHeader.PackageId.ToString("X2"), packageHeader.Length, connection.State.ToString());
                     }
                 }
             }

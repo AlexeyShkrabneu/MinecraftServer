@@ -2,6 +2,6 @@
 
 public interface IMojangAuthService
 {
-    Task<IPlayerProfile> GetMojangPlayerProfileAsync(string username, Guid playerId, CancellationToken cancellationToken = default);
-    Task<bool> IsAuthenticatedAsync(string username, byte[] sharedSecret, CancellationToken cancellationToken = default);
+    Task<IPlayerProfile> GetPlayerProfileAsync(string username, Guid playerId, CancellationToken cancellationToken = default);
+    Task<IPlayerProfile> GetAuthenticatedPlayerProfileAsync(string username, byte[] sharedSecret, CancellationToken cancellationToken = default);
 }

@@ -22,17 +22,17 @@ public class EncryptionResponseServerBoundPackage(
 
         connection.UseEncryption(decodedSharedSecret);
 
-        if (serverOptions.OnlineMode)
+        IPlayerProfile playerProfile = serverOptions.OnlineMode
+            ? await mojangAuthService.GetAuthenticatedPlayerProfileAsync(connection.PlayerProfile.Username, decodedSharedSecret, cancellationToken)
+            : await mojangAuthService.GetPlayerProfileAsync(connection.PlayerProfile.Username, connection.PlayerProfile.Id, cancellationToken);
+
+        if (serverOptions.OnlineMode && playerProfile is null)
         {
-            var authenticated = await mojangAuthService
-                .IsAuthenticatedAsync(connection.PlayerProfile.Username, decodedSharedSecret);
-            
-            if (!authenticated)
-            {
-                return new LoginDisconnectCleintBoundPackage(
+            return new LoginDisconnectCleintBoundPackage(
                     DefaultTextComponents.ServerOplineModeUnathorizadPlayer());
-            }
         }
+
+        connection.SetPlayerProfile(playerProfile);
 
         return new LoginSuccessClientBoundPackage();
     }
