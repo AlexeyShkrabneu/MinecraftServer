@@ -25,7 +25,7 @@ public class EncryptionResponseServerBoundPackage(
         if (serverOptions.OnlineMode)
         {
             var authenticated = await mojangAuthService
-                .IsAuthenticatedAsync(connection.PlayerProfile.Username, sharedSecret);
+                .IsAuthenticatedAsync(connection.PlayerProfile.Username, decodedSharedSecret);
             
             if (!authenticated)
             {

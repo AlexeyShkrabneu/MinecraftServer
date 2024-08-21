@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Services;
+﻿using System.Buffers.Text;
+
+namespace Infrastructure.Services;
 
 public class MojangAuthService(
     ServerEncryption serverEncryption)
@@ -32,7 +34,7 @@ public class MojangAuthService(
 
     public async Task<bool> IsAuthenticatedAsync(string username, byte[] sharedSecret, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(username) || sharedSecret.Length != 128)
+        if (string.IsNullOrEmpty(username) || sharedSecret.Length != 16)
         {
             return false;
         }
@@ -51,24 +53,19 @@ public class MojangAuthService(
 
     private string GenerateServerHash(byte[] sharedSecretBytes)
     {
-        using var sha1 = SHA1.Create();
+        var serverId = Encoding.Latin1.GetBytes(ProtocolDefinition.ServerId);
+        var publicKey = serverEncryption.PublicKeyDERFormat;
 
-        var serverIdBytes = Encoding.Latin1.GetBytes(ProtocolDefinition.ServerId);
-        var serverPublicKeyBytes = serverEncryption.PublicKey;
+        using var sha = SHA1.Create();
 
-        using var ms = new MemoryStream();
+        sha.TransformBlock(serverId, 0, serverId.Length, serverId, 0);
+        sha.TransformBlock(sharedSecretBytes, 0, sharedSecretBytes.Length, sharedSecretBytes, 0);
+        sha.TransformFinalBlock(publicKey, 0, publicKey.Length);
 
-        ms.Write(serverIdBytes, 0, serverIdBytes.Length);
-        ms.Write(sharedSecretBytes, 0, sharedSecretBytes.Length);
-        ms.Write(serverPublicKeyBytes, 0, serverPublicKeyBytes.Length);
-
-        var hashBytes = sha1.ComputeHash(ms);
-
-        Array.Reverse(hashBytes);
-        var b = new BigInteger(hashBytes);
-
-        return b < 0
-            ? "-" + (-b).ToString("x").TrimStart('0')
-            : b.ToString("x").TrimStart('0');
+        var hashNumber = new BigInteger(sha.Hash, false, true);
+        
+        return hashNumber < 0
+            ? "-" + (-hashNumber).ToString("x").TrimStart('0')
+            : hashNumber.ToString("x").TrimStart('0');
     }
 }

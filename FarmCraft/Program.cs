@@ -1,5 +1,6 @@
 ﻿var server = MinecraftServer
     .CreateBuilder()
+    .ConfigureServer(x => x.OnlineMode = true)
     .UseIcon()
     .Build();
 
