@@ -16,45 +16,48 @@ public class LoginStartServerBoundPackage(
 
         if (playerName.Length > serverOptions.MaxPlayerUserNameLength)
         {
-            return new LoginDisconnectCleintBoundPackage(
-                DefaultTextComponents.UsernameInvalidLength(playerName, serverOptions.MaxPlayerUserNameLength));
+            await connection.DisconnectAsync(
+                DefaultTextComponents.UsernameInvalidLength(playerName, serverOptions.MaxPlayerUserNameLength), 
+                cancellationToken);
+
+            return new NoActionNeededClientBoundPackage();
         }
 
         if(connection.ProtocolVersion > serverOptions.ProtocolVersion)
         {
-            return new LoginDisconnectCleintBoundPackage(
-                DefaultTextComponents.ServerVersionIsOutdated(serverOptions.VersionName));
+            await connection.DisconnectAsync(
+                DefaultTextComponents.ServerVersionIsOutdated(serverOptions.VersionName),
+                cancellationToken);
+
+            return new NoActionNeededClientBoundPackage();
         }
 
         if(connection.ProtocolVersion < serverOptions.ProtocolVersion)
         {
-            return new LoginDisconnectCleintBoundPackage(
-                DefaultTextComponents.ServerVersionIsModern(serverOptions.VersionName));
+            await connection.DisconnectAsync(
+                DefaultTextComponents.ServerVersionIsModern(serverOptions.VersionName),
+                cancellationToken);
+
+            return new NoActionNeededClientBoundPackage();
         }
 
-        if (playerManager.OnlinePlayers.Length == serverOptions.MaxPlayersCount)
+        if (playerManager.OnlinePlayersCount == serverOptions.MaxPlayersCount)
         {
-            return new LoginDisconnectCleintBoundPackage(
-                DefaultTextComponents.ServerMaxPlayersOnline(serverOptions.MaxPlayersCount));
+            await connection.DisconnectAsync(
+                DefaultTextComponents.ServerMaxPlayersOnline(serverOptions.MaxPlayersCount),
+                cancellationToken);
+
+            return new NoActionNeededClientBoundPackage();
         }
 
         if (playerManager.IsPlayerOnline(playerName))
         {
-            return new LoginDisconnectCleintBoundPackage(
-                DefaultTextComponents.PlayerIsAlreadyOnline(playerName));
+            await connection.DisconnectAsync(
+                DefaultTextComponents.PlayerIsAlreadyOnline(playerName),
+                cancellationToken);
+
+            return new NoActionNeededClientBoundPackage();
         }
-
-        /*
-        var playerProfile = await mojangAuthService.GetMojangPlayerProfileAsync(playerName, playerId, cancellationToken);
-
-        if (playerProfile is null || !playerProfile.ExistsInMojang && serverOptions.OnlineMode) 
-        {
-            return new LoginDisconnectCleintBoundPackage(
-                DefaultTextComponents.ServerOplineModeUnathorizadPlayer());
-        }
-
-        connection.SetPlayerProfile(playerProfile);
-        */
 
         connection.SetPlayerProfile(new PlayerProfile(playerId, playerName, [], false));
 

@@ -76,6 +76,23 @@ public class Connection : IConnection
 
         return new IncomingPackageHeader(id, length);
     }
+    public async Task DisconnectAsync(TextComponent reason, CancellationToken cancellationToken = default)
+    {
+        var disconnectPackageId = State switch
+        {
+            ConnectionState.Login => ProtocolDefinition.LoginDisconnectPackageId,
+            ConnectionState.Configuration => ProtocolDefinition.ConfigurationDisconnectPackageId,
+            ConnectionState.Play => ProtocolDefinition.PlayDisconnectPackageId,
+            _ => throw new Exception("Invalid Connection state")
+        };
+
+        var reasonTextComponentJson = JsonConvert.SerializeObject(reason);
+
+        await Stream
+            .WriteVarInt(disconnectPackageId)
+            .WriteString(reasonTextComponentJson)
+            .SendAsync(cancellationToken);
+    }
 
     public bool ValidateVerifyToken(byte[] verifyTokenBytes)
     {

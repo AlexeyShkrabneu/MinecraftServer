@@ -18,8 +18,8 @@ public class StatusServerBoundPackage(
             Palyers = new()
             {
                 Players = activePlayers,
-                OnlinePlayers = activePlayers.Length,
-                MaxPlayers = serverOptions.MaxPlayersCount
+                MaxPlayers = serverOptions.MaxPlayersCount,
+                OnlinePlayers = playerManager.OnlinePlayersCount
             },
             IconBase64 = serverOptions.IconBase64,
             Description = serverOptions.Description,

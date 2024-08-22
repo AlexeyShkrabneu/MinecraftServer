@@ -28,8 +28,11 @@ public class EncryptionResponseServerBoundPackage(
 
         if (serverOptions.OnlineMode && playerProfile is null)
         {
-            return new LoginDisconnectCleintBoundPackage(
-                    DefaultTextComponents.ServerOplineModeUnathorizadPlayer());
+           await connection.DisconnectAsync(
+                DefaultTextComponents.ServerOplineModeUnathorizadPlayer(),
+                cancellationToken);
+
+            return new NoActionNeededClientBoundPackage();
         }
 
         connection.SetPlayerProfile(playerProfile);

@@ -19,4 +19,12 @@ public static class ProtocolDefinition
     public const string ServerId = "";
     public const bool CleintStrictErrorHandling = false;
     #endregion
+
+    #region Configuration
+    public const int ConfigurationDisconnectPackageId = 0x02;
+    #endregion
+
+    #region Play
+    public const int PlayDisconnectPackageId = 0x1D;
+    #endregion
 }

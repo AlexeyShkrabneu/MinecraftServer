@@ -2,7 +2,13 @@
 
 public interface IPlayerManager
 {
-    PlayerSample[] OnlinePlayers { get; }
+    int OnlinePlayersCount { get; }
+    IEnumerable<PlayerSample> OnlinePlayers { get; }
 
     bool IsPlayerOnline(string userName);
+    void AddPlayer(IConnection connection);
+
+    void RemovePlayer(Guid uiid);
+    void RemovePlayer(string uiid);
+    void RemovePlayer(IConnection connection);
 }

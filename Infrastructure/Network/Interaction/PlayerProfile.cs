@@ -10,4 +10,5 @@ public class PlayerProfile(
     public string Username { get; } = userName;
     public bool ExistsInMojang { get; } = existingMojangAccount;
     public PlayerProperty[] Properties { get; } = properties;
+    public string IdString { get; } = id.ToString().Replace("-", "");
 }

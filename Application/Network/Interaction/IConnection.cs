@@ -10,6 +10,7 @@ public interface IConnection : IDisposable
     IPlayerProfile PlayerProfile { get; }
 
     Task<IncomingPackageHeader> ReadIncomingPackageHeaderAsync(CancellationToken cancellationToken = default);
+    Task DisconnectAsync(TextComponent reason, CancellationToken cancellationToken = default);
     void SetState(ConnectionState connectionState);
     void SetVerifyToken(byte[] verifyTokenBytes);
     bool ValidateVerifyToken(byte[] verifyTokenBytes);

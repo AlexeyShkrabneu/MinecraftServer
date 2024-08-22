@@ -11,6 +11,6 @@ public class LoginPackageHandler(
     [
         new LoginStartServerBoundPackage(serverOptions, serverEncryption, playerManager, mojangAuthService),
         new EncryptionResponseServerBoundPackage(serverOptions, serverEncryption, mojangAuthService),
-        new LoginAcknowledgedServerBoundPackage(),
+        new LoginAcknowledgedServerBoundPackage(playerManager),
     ];
 }

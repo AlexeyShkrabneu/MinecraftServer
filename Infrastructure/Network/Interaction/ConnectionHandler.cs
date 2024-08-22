@@ -2,6 +2,7 @@
 
 public class ConnectionHandler(
     ILogger logger,
+    IPlayerManager playerManager,
     ILoginPackageHandler loginHandler,
     IStatusPackageHandler statusHandler,
     IPlayPackageHandler playPackageHandler,
@@ -43,9 +44,11 @@ public class ConnectionHandler(
         catch (Exception ex) 
         {
             logger.Error(ex, "Error occurred while handling  connection. Exception:");
+            await connection.DisconnectAsync(DefaultTextComponents.DisconnectDueToIssue(), cancellationToken);
         }
         finally 
-        { 
+        {
+            playerManager.RemovePlayer(connection);
             connection.Dispose(); 
         }
     }

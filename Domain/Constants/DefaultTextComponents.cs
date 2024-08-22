@@ -96,4 +96,20 @@ public static class DefaultTextComponents
             ]
         };
     }
+
+    public static TextComponent DisconnectDueToIssue()
+    {
+        return new()
+        {
+            Text = "Oops...",
+            Color = "#92000A",
+            Exta =
+            [
+               new() { Text = "\n\nAn error occurred during your game." },
+                new() { Text = "\nPlease try to "},
+                new() { Text = "reconnect", Color = "#05fa09" },
+                new() { Text = "." },
+            ]
+        };
+    }
 }

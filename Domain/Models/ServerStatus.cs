@@ -36,5 +36,5 @@ public class PlayersInfo
     public int OnlinePlayers { get; set; }
 
     [JsonProperty("sample", NullValueHandling = NullValueHandling.Ignore)]
-    public PlayerSample[] Players { get; set; }
+    public IEnumerable<PlayerSample> Players { get; set; }
 }
