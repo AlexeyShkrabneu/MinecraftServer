@@ -13,7 +13,7 @@ public class StatusServerBoundPackage(
             Version = new()
             {
                 Name = serverOptions.Name,
-                Protocol = serverOptions.ProtocolVersion
+                Protocol = ServerConstants.ProtocolVersion
             },
             Palyers = new()
             {

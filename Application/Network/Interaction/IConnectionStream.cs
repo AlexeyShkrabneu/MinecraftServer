@@ -15,6 +15,7 @@ public interface IConnectionStream
     Task<bool> ReadBool(CancellationToken cancellationToken = default);
 
     IConnectionStream WriteVarInt(int value);
+    IConnectionStream WriteInt(int value);
     IConnectionStream WriteLong(long value);
     IConnectionStream WriteString(string value);
     IConnectionStream WriteBytes(byte[] value);

@@ -2,39 +2,22 @@
 
 public class ServerOptions
 {
-    #region Default values
-    protected const ushort DefaultPort = 25565;
-    protected const int DefaultMaxPlayersCount = 10;
-    protected const int DefaultProtocolVersion = 767;
-    protected const int DefaultMaxPlayerUserNameLength = 16;
-    protected const string DefaultHots = "localhost";
-    protected const string DefaultName = "Minecraft Server";
-    protected const string DefaultVersionName = "1.21";
-    protected const bool DefaultEnforcesSecureChat = false;
-    protected const bool DefaultOnlineMode = false;
-    protected const bool DefautlUseEncryption = true;
-    protected const bool DefaultDisplayInLocalNetwork = true;
-    protected static readonly TextComponent DefaultDescription = new()
-    {
-        Type = TextComponentType.Text,
-        Text = "Locale Minecraft Server",
-        Color = "#7eff47"
-    };
-    #endregion
-
     #region Game options
-    public string Host { get; set; } = DefaultHots;
-    public string Name { get; set; } = DefaultName;
+    public string Host { get; set; } = ServerConstants.DefaultHots;
+    public string Name { get; set; } = ServerConstants.DefaultName;
+    public TextComponent Description { get; set; } = ServerConstants.DefaultDescription;
+    public int MaxPlayersCount { get; set; } = ServerConstants.DefaultMaxPlayersCount;
+    public bool EnforcesSecureChat { get; set; } = ServerConstants.DefaultEnforcesSecureChat;
+    public bool DisplayInLocalNetwork { get; set; } = ServerConstants.DefaultDisplayInLocalNetwork;
+    public int MaxPlayerUserNameLength { get; set; } = ServerConstants.DefaultMaxPlayerUserNameLength;
+    public bool OnlineMode { get; set; } = ServerConstants.DefaultOnlineMode;
+    public bool UseEncryption { get; set; } = ServerConstants.DefautlUseEncryption;
+    public bool IsHardcore { get; set; } = ServerConstants.DefaultIsHardcore;
+    public int ViewDistance { get; set; } = ServerConstants.DefaultViewDistance;
+    public int SimulationDistance { get; set; } = ServerConstants.DefaultSimulationDistance;
+    public bool ReducedDebugInfo { get; set; } = ServerConstants.DefaultReducedDebugInfo;
+    public bool EnableRespawnScreen { get; set; } = ServerConstants.DefaultEnableRespawnScreen;
     public string IconBase64 { get; protected set; } = null;
-    public TextComponent Description { get; set; } = DefaultDescription;
-    public string VersionName { get; set; } = DefaultVersionName;
-    public int ProtocolVersion { get; set; } = DefaultProtocolVersion;
-    public int MaxPlayersCount { get; set; } = DefaultMaxPlayersCount;
-    public bool EnforcesSecureChat { get; set; } = DefaultEnforcesSecureChat;
-    public bool DisplayInLocalNetwork { get; set; } = DefaultDisplayInLocalNetwork;
-    public int MaxPlayerUserNameLength { get; set; } = DefaultMaxPlayerUserNameLength;
-    public bool OnlineMode { get; set; } = DefaultOnlineMode;
-    public bool UseEncryption { get; set; } = DefautlUseEncryption;
     #endregion
 
     public Random Random = new();

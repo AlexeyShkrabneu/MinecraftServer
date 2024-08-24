@@ -23,19 +23,19 @@ public class LoginStartServerBoundPackage(
             return new NoActionNeededClientBoundPackage();
         }
 
-        if(connection.ProtocolVersion > serverOptions.ProtocolVersion)
+        if(connection.ProtocolVersion > ServerConstants.ProtocolVersion)
         {
             await connection.DisconnectAsync(
-                DefaultTextComponents.ServerVersionIsOutdated(serverOptions.VersionName),
+                DefaultTextComponents.ServerVersionIsOutdated(ServerConstants.VersionName),
                 cancellationToken);
 
             return new NoActionNeededClientBoundPackage();
         }
 
-        if(connection.ProtocolVersion < serverOptions.ProtocolVersion)
+        if(connection.ProtocolVersion < ServerConstants.ProtocolVersion)
         {
             await connection.DisconnectAsync(
-                DefaultTextComponents.ServerVersionIsModern(serverOptions.VersionName),
+                DefaultTextComponents.ServerVersionIsModern(ServerConstants.VersionName),
                 cancellationToken);
 
             return new NoActionNeededClientBoundPackage();

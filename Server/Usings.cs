@@ -1,4 +1,5 @@
 ﻿global using Application.Network.Interaction;
+global using Domain.Constants;
 global using Domain.Models.Encryption;
 global using Domain.Options;
 global using Infrastructure;

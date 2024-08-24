@@ -126,6 +126,7 @@ public class ConnectionStream(NetworkStream _networkStream) : IConnectionStream,
     public IConnectionStream WriteBool(bool value) => WriteBytes(ToBytes(value));
     public IConnectionStream WriteString(string value) => WriteBytes(ToBytes(value));
     public IConnectionStream WriteVarInt(int value) => WriteBytes(ToBytesVarInt(value));
+    public IConnectionStream WriteInt(int value) => WriteBytes(ToBytes(value));
     
     public IConnectionStream WriteByteArrayWithLength(byte[] value)
     {
@@ -207,6 +208,11 @@ public class ConnectionStream(NetworkStream _networkStream) : IConnectionStream,
         } while (value != 0);
 
         return buffer.ToArray();
+    }
+
+    private byte[] ToBytes(int value)
+    {
+        return BitConverter.GetBytes(value);
     }
 
     private byte[] ToBytes(long value)
